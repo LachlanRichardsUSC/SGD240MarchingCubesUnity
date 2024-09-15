@@ -1,4 +1,7 @@
-// These two arrays allow for easy lookup of the indices of the two corner points that form an edge.
+// This is an alternate version of MarchingCubesTable.cs, packaged in
+// a compute shader instead of a C# script. The meshing algorithm will
+// be ported over to a compute shader at a later point in development.
+
 static const int cornerIndexAFromEdge[12] = {0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3};
 static const int cornerIndexBFromEdge[12] = {1, 2, 3, 0, 5, 6, 7, 4, 4, 5, 6, 7};
 
