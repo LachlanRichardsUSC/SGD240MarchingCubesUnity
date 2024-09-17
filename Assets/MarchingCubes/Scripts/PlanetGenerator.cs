@@ -1,6 +1,6 @@
-// Meshing Algorthm ported from Unreal Engine
+// Meshing Algorithm ported from Unreal Engine
 // This code still runs on the CPU and is
-// not hyperthreaded, so performance leaves
+// not multithreaded, so performance leaves
 // a lot to be desired.
 
 using System.Collections.Generic;
@@ -10,10 +10,12 @@ namespace MarchingCubes.Scripts
 {
     public class PlanetGenerator : MonoBehaviour
     {
-        public int gridSize = 128; // Number of voxels along each axis
-        public float voxelSize = 20.0f; // Size of each voxel
-        public float planetRadius = 384f; // planet radius
+        public int gridSize = 192; // Number of voxels along each axis
+        public float voxelSize = 16.0f; // Size of each voxel
+        public float planetRadius = 400f; // Explicit planet radius
         public Material planetMaterial; // Material to apply to the planet mesh
+        public float noiseScale = 0.02f;  // Controls the frequency of the noise
+        public float noiseAmplitude = 150.0f;  // Controls the height of the terrain (amplitude)
 
         private MeshFilter _meshFilter;
         private MeshRenderer _meshRenderer;
@@ -42,15 +44,15 @@ namespace MarchingCubes.Scripts
         // Method to generate the entire planet
         void GeneratePlanet()
         {
-            // Step 1: Generate the voxel grid
+            // Generate the voxel grid
             _voxels = GenerateVoxelGrid();
 
-            // Step 2: Run marching cubes algorithm to generate mesh data
+            // Run marching cubes algorithm to generate mesh data
             List<Vector3> vertices;
             List<int> triangles;
             MarchingCubes(_voxels, out vertices, out triangles);
 
-            // Step 3: Create mesh and assign it to the MeshFilter
+            // Create mesh and assign it to the MeshFilter
             CreateMesh(vertices, triangles);
         }
         
@@ -108,22 +110,31 @@ namespace MarchingCubes.Scripts
 
             return voxelList;
         }
+        
+        public static float PerlinNoise3D(float x, float y, float z)
+        {
+            float offset = 100.0f; // Arbitrary large value to offset axes
+            float xy = Mathf.PerlinNoise(x, y);
+            float yz = Mathf.PerlinNoise(y + offset, z);
+            float xz = Mathf.PerlinNoise(x + offset * 2, z);
+            float yx = Mathf.PerlinNoise(y + offset * 3, x);
+            float zx = Mathf.PerlinNoise(z + offset * 4, x);
+            float zy = Mathf.PerlinNoise(z + offset * 5, y);
+    
+            return (xy + yz + xz + yx + zx + zy) / 6.0f;
+        }
 
         // Method to calculate the density value for a given position
         private float CalculateDensity(Vector3 position)
         {
             Vector3 planetCenter = Vector3.zero;
-            float noiseScale = 0.01f;
-            float noiseAmplitude = 100.0f;
+            float distanceFromCenter = Vector3.Distance(position, planetCenter);
 
-            // Calculate the distance from the center of the planet using planetRadius
-            float distance = Vector3.Distance(position, planetCenter);
+            // Adjust the density calculation with Noise
+            float noiseValue = PerlinNoise3D(position.x * noiseScale, position.y * noiseScale, position.z * noiseScale);
 
-            // Generate Perlin noise to add terrain variation
-            float noiseValue = Mathf.PerlinNoise(position.x * noiseScale, position.z * noiseScale) * noiseAmplitude;
-
-            // Combine the distance and noise to generate the final density value
-            return (planetRadius - distance) + noiseValue;
+            // Density combines distance and noise for shaping the planet
+            return (planetRadius - distanceFromCenter) + noiseValue * noiseAmplitude;
         }
 
         // Marching cubes algorithm to generate vertices and triangles based on the voxel grid
@@ -163,8 +174,8 @@ namespace MarchingCubes.Scripts
                 {
                     int vertexIndex = vertices.Count;
                     vertices.Add(edgeVertices[MarchingCubesTable.TriTable[voxelConfig][i]]);
-                    vertices.Add(edgeVertices[MarchingCubesTable.TriTable[voxelConfig][i + 1]]);
                     vertices.Add(edgeVertices[MarchingCubesTable.TriTable[voxelConfig][i + 2]]);
+                    vertices.Add(edgeVertices[MarchingCubesTable.TriTable[voxelConfig][i + 1]]);
 
                     triangles.Add(vertexIndex);
                     triangles.Add(vertexIndex + 1);
@@ -193,18 +204,19 @@ namespace MarchingCubes.Scripts
         
         void OnDrawGizmos()
         {
-            // Check if _voxels is null or empty before attempting to draw gizmos
-            if (_voxels == null || _voxels.Count == 0) 
-                return;
-            Debug.Log("Drawing Gizmos..."); // Add this to check if it's being called
+            // Calculate the voxel size relative to the planet's radius
+            float voxelSize = planetRadius / gridSize;
+
+            // Calculate the grid center offset to center the planet at (0, 0, 0)
+            Vector3 gridCenterOffset = new Vector3(gridSize / 2f, gridSize / 2f, gridSize / 2f) * voxelSize;
+
+            // Define the grid's boundary (a cube enclosing the grid)
+            Vector3 gridMin = -gridCenterOffset;  // Bottom-left corner
+            Vector3 gridMax = gridMin + new Vector3(gridSize, gridSize, gridSize) * voxelSize; // Top-right corner
+
+            // Draw the boundary of the voxel grid (a wire cube)
             Gizmos.color = Color.green;
-            foreach (var voxel in _voxels)
-            {
-                foreach (var corner in voxel.CornerPositions)
-                {
-                    Gizmos.DrawWireCube(corner, Vector3.one * voxelSize);
-                }
-            }
+            Gizmos.DrawWireCube(Vector3.zero, new Vector3(gridMax.x - gridMin.x, gridMax.y - gridMin.y, gridMax.z - gridMin.z));
         }
     }
 }
