@@ -16,6 +16,7 @@ namespace MarchingCubes.Scripts
         public Material planetMaterial; // Material to apply to the planet mesh
         public float noiseScale = 0.02f;  // Controls the frequency of the noise
         public float noiseAmplitude = 150.0f;  // Controls the height of the terrain (amplitude)
+        public bool showDebug = true;
 
         private MeshFilter _meshFilter;
         private MeshRenderer _meshRenderer;
@@ -40,7 +41,7 @@ namespace MarchingCubes.Scripts
             GeneratePlanet();
             AdjustPlanetScale();
         }
-
+        
         // Method to generate the entire planet
         void GeneratePlanet()
         {
@@ -201,22 +202,26 @@ namespace MarchingCubes.Scripts
 
             _meshFilter.mesh = mesh;
         }
-        
+
         void OnDrawGizmos()
         {
-            // Calculate the voxel size relative to the planet's radius
-            float voxelSize = planetRadius / gridSize;
+            if (showDebug)
+            {
+                // Calculate the voxel size relative to the planet's radius
+                float voxelSize = planetRadius / gridSize;
 
-            // Calculate the grid center offset to center the planet at (0, 0, 0)
-            Vector3 gridCenterOffset = new Vector3(gridSize / 2f, gridSize / 2f, gridSize / 2f) * voxelSize;
+                // Calculate the grid center offset to center the planet at (0, 0, 0)
+                Vector3 gridCenterOffset = new Vector3(gridSize / 2f, gridSize / 2f, gridSize / 2f) * voxelSize;
 
-            // Define the grid's boundary (a cube enclosing the grid)
-            Vector3 gridMin = -gridCenterOffset;  // Bottom-left corner
-            Vector3 gridMax = gridMin + new Vector3(gridSize, gridSize, gridSize) * voxelSize; // Top-right corner
+                // Define the grid's boundary (a cube enclosing the grid)
+                Vector3 gridMin = -gridCenterOffset; // Bottom-left corner
+                Vector3 gridMax = gridMin + new Vector3(gridSize, gridSize, gridSize) * voxelSize; // Top-right corner
 
-            // Draw the boundary of the voxel grid (a wire cube)
-            Gizmos.color = Color.green;
-            Gizmos.DrawWireCube(Vector3.zero, new Vector3(gridMax.x - gridMin.x, gridMax.y - gridMin.y, gridMax.z - gridMin.z));
+                // Draw the boundary of the voxel grid (a wire cube)
+                Gizmos.color = Color.green;
+                Gizmos.DrawWireCube(Vector3.zero,
+                    new Vector3(gridMax.x - gridMin.x, gridMax.y - gridMin.y, gridMax.z - gridMin.z));
+            }
         }
     }
 }

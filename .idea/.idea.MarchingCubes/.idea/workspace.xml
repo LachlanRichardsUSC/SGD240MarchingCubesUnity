@@ -6,15 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="cb6202d1-e665-4e3c-89b5-84d12418bc6b" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.MarchingCubes/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.MarchingCubes/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/MarchingCubes/Scripts/ComputeShaders/Includes.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/MarchingCubes/Scripts/ComputeShaders/Includes/MarchingCubesTable.compute" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/MarchingCubes/Scripts/ComputeShaders/Includes/MarchingCubesTable.compute.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/MarchingCubes/Scripts/MarchingCubesTable.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/MarchingCubes/Scripts/MarchingCubesTable.cs.meta" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/MarchingCubes/Scripts/PlanetGenerator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/MarchingCubes/Scripts/PlanetGenerator.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/MarchingCubes/Scripts/PlanetGenerator.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/MarchingCubes/Scripts/PlanetGenerator.cs.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Materials/PlanetMaterial.mat" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Materials/PlanetMaterial.mat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scenes/SampleScene.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/SampleScene.unity" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -115,7 +107,7 @@
       <workItem from="1726553279078" duration="9537000" />
       <workItem from="1726563823247" duration="4447000" />
       <workItem from="1726790172449" duration="1498000" />
-      <workItem from="1726791734910" duration="5257000" />
+      <workItem from="1726791734910" duration="6374000" />
     </task>
     <servers />
   </component>
