@@ -1,0 +1,36 @@
+#pragma kernel Swizzle
+
+// Read and write to 2D Textures
+// Account for the width and height of the texture
+RWTexture2D<float4> Source;
+uint width;
+uint height;
+
+// Coefficients for calculating each channel in the swizzle operation
+float4 x;
+float4 y;
+float4 z;
+float4 w;
+
+// Number of threads to be dispatched per thread group (8x8 threads)
+[numthrads(8,8,1)]
+void Swizzle (uint3 id : SV_DispatchThreadID)
+{
+    // Check if current thread position is within bounds of the texture
+    // If not, return early to avoid out of bounds memory access
+    if (id.x < 0 || id.x >= width || id.y < 0 || id.y >= height)
+    {
+        return;
+    }
+
+    float4 colour = Source[id.xy];
+
+    // Calculate new color channels using the dot product with their corresponding coefficients
+    float red = dot(colour, x);
+    float green = dot(colour, y);
+    float blue = dot(colour, z);
+    float alpha = dot(colour, w);
+
+    // Write the swizzled texture back to the source texture
+    Source[id.xy] = float4(red, green, blue, alpha);
+}
