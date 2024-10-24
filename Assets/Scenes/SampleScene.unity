@@ -160,7 +160,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 1
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_BackGroundColor: {r: 0, g: 0, b: 0, a: 1}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -210,7 +210,7 @@ Transform:
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: -97.5}
+  m_LocalPosition: {x: 0, y: 0, z: -633.64}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -406,7 +406,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 602428152}
-  - component: {fileID: 602428153}
+  - component: {fileID: 602428154}
   m_Layer: 0
   m_Name: PlanetObject
   m_TagString: Untagged
@@ -423,13 +423,13 @@ Transform:
   m_GameObject: {fileID: 602428150}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 2.55, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &602428153
+--- !u!114 &602428154
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -438,16 +438,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 602428150}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7e909322d0877c2459614300433ff859, type: 3}
+  m_Script: {fileID: 11500000, guid: 791ca5162980d954b981d84c05256cc0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gridSize: 192
+  marchingCubesShader: {fileID: 0}
+  noiseShader: {fileID: 7200000, guid: 3b6927a8a0a7f9042872cf8981400f5e, type: 3}
+  terrainMaterial: {fileID: 2100000, guid: 5bc73838c53f808418e05d3c9485ed36, type: 2}
+  gridSize: 32
   voxelSize: 16
-  planetRadius: 200
-  planetMaterial: {fileID: 2100000, guid: 5bc73838c53f808418e05d3c9485ed36, type: 2}
   noiseScale: 0.02
-  noiseAmplitude: 150
-  showDebug: 1
+  noiseAmplitude: 0
 --- !u!1 &832575517
 GameObject:
   m_ObjectHideFlags: 0

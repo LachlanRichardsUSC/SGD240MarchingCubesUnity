@@ -6,7 +6,18 @@
   <component name="ChangeListManager">
     <list default="true" id="cb6202d1-e665-4e3c-89b5-84d12418bc6b" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.MarchingCubes/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.MarchingCubes/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/MarchingCubes/Scripts/PlanetGenerator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/MarchingCubes/Scripts/PlanetGenerator.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/MarchingCubes/CPU Based Approach/Channel.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/MarchingCubes/CPU Based Approach/Channel.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/MarchingCubes/CPU Based Approach/ComputeHelper.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/MarchingCubes/CPU Based Approach/ComputeHelper.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/MarchingCubes/CPU Based Approach/ComputeShaders/MarchingCubesTable.compute" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/MarchingCubes/CPU Based Approach/ComputeShaders/MarchingCubesTable.compute.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/MarchingCubes/CPU Based Approach/ComputeShaders/Noise.compute" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/MarchingCubes/CPU Based Approach/ComputeShaders/Noise.compute.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/MarchingCubes/CPU Based Approach/VertexData.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/MarchingCubes/CPU Based Approach/VertexData.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/MarchingCubes/Shader Based Approach/Scripts/TerrainGenerator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/MarchingCubes/Shader Based Approach/Scripts/TerrainGenerator.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scenes/SampleScene.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/SampleScene.unity" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -20,12 +31,8 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="file://$PROJECT_DIR$/Assets/MarchingCubes/Scripts/Channel.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/MarchingCubes/Scripts/ComputeHelper.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/MarchingCubes/Scripts/ComputeShaders/DensityTexture.compute" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/MarchingCubes/Scripts/ComputeShaders/MarchingCubes.compute" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/MarchingCubes/Scripts/ComputeShaders/Swizzle.compute" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/MarchingCubes/Scripts/PlanetGenerator.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/MarchingCubes/Shader Based Approach/Helpers/Channel.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/MarchingCubes/Shader Based Approach/Shaders/Noise.compute" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.ide.rider@3.0.31/Rider/Editor/RiderScriptEditor.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="ProblemsViewState">
@@ -109,7 +116,9 @@
       <workItem from="1726790172449" duration="1498000" />
       <workItem from="1726791734910" duration="6374000" />
       <workItem from="1729701611179" duration="116000" />
-      <workItem from="1729701735796" duration="3098000" />
+      <workItem from="1729701735796" duration="8804000" />
+      <workItem from="1729788249522" duration="1452000" />
+      <workItem from="1729789727791" duration="4443000" />
     </task>
     <servers />
   </component>

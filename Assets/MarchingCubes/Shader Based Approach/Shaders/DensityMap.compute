@@ -1,0 +1,32 @@
+#pragma kernel CSMain
+
+#include "Noise.compute"
+
+RWStructuredBuffer<float> densityMap;
+
+int gridSize;
+float noiseScale;
+float noiseAmplitude;
+float planetRadius;
+
+[numthreads(8,8,8)]
+void CSMain(uint3 id : SV_DispatchThreadID)
+{
+    if (any(id >= uint3(gridSize, gridSize, gridSize))) return;
+    
+    // Convert to world position (centered around origin)
+    float3 pos = (float3)(id - uint3(gridSize/2, gridSize/2, gridSize/2)) * noiseScale;
+    
+    // Calculate basic sphere density
+    float sphereDensity = length(pos) - planetRadius;
+    
+    // Add noise
+    float noiseValue = snoise(pos);
+    
+    // Combine density (negative is inside surface)
+    float density = sphereDensity + noiseValue * noiseAmplitude;
+    
+    // Store in buffer
+    int index = id.x + gridSize * (id.y + gridSize * id.z);
+    densityMap[index] = density;
+}
