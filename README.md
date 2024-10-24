@@ -29,6 +29,8 @@ compute shaders down the line. Working in Unity, both on the engine side and in 
 and more comfortable, as I am used to C# programming. I also have plans to decouple some functionality from my
 Planet Generator script to make the code more scalable.
 
+![Unity Progress](https://github.com/LachlanRichardsUSC/SGD240MarchingCubesUnity/blob/main/march%20cubes%20unity.png)
+
 # Engine of Choice:
 Unity 2022.3.45f1
 
