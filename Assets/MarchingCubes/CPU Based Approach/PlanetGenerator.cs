@@ -3,6 +3,7 @@
 // not multithreaded, so performance leaves
 // a lot to be desired.
 
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -10,7 +11,7 @@ namespace MarchingCubes.Scripts
 {
     public class PlanetGenerator : MonoBehaviour
     {
-        public int gridSize = 192; // Number of voxels along each axis
+        public int gridSize = 32; // Number of voxels along each axis
         public float voxelSize = 16.0f; // Size of each voxel
         public float planetRadius = 400f; // Explicit planet radius
         public Material planetMaterial; // Material to apply to the planet mesh
@@ -34,14 +35,34 @@ namespace MarchingCubes.Scripts
         void Start()
         {
             // Initialize MeshFilter and MeshRenderer components
-            _meshFilter = gameObject.AddComponent<MeshFilter>();
-            _meshRenderer = gameObject.AddComponent<MeshRenderer>();
+            _meshFilter = gameObject.GetComponent<MeshFilter>();
+            if (_meshFilter == null)
+            {
+                _meshFilter = gameObject.AddComponent<MeshFilter>();
+            }
+
+            _meshRenderer = gameObject.GetComponent<MeshRenderer>();
+            if (_meshRenderer == null)
+            {
+                _meshRenderer = gameObject.AddComponent<MeshRenderer>();
+            }
             _meshRenderer.material = planetMaterial;
 
-            GeneratePlanet();
+            UpdateGridSize();    // Ensure grid size is correct before generating the planet
+            GeneratePlanet();    // Now generate the planet
             AdjustPlanetScale();
         }
-        
+
+        private void OnValidate()
+        {
+            UpdateGridSize();
+        }
+
+        void UpdateGridSize()
+        {
+            gridSize = Mathf.CeilToInt((2 * planetRadius) / voxelSize) + 2; // Adding a buffer to make sure the planet fits within the bounds
+        }
+
         // Method to generate the entire planet
         void GeneratePlanet()
         {
@@ -73,7 +94,7 @@ namespace MarchingCubes.Scripts
             List<Voxel> voxelList = new List<Voxel>();
     
             // Calculate the grid center offset to center the planet at (0, 0, 0)
-            Vector3 gridCenterOffset = new Vector3(gridSize / 2f, gridSize / 2f, gridSize / 2f) * voxelSize;
+            Vector3 gridCenterOffset = new Vector3(gridSize * voxelSize / 2.0f, gridSize * voxelSize / 2.0f, gridSize * voxelSize / 2.0f) - new Vector3(voxelSize / 2.0f, voxelSize / 2.0f, voxelSize / 2.0f);
 
             for (int x = 0; x < gridSize; x++)
             {
@@ -114,7 +135,7 @@ namespace MarchingCubes.Scripts
         
         public static float PerlinNoise3D(float x, float y, float z)
         {
-            float offset = 100.0f; // Arbitrary large value to offset axes
+            float offset = 400.0f; // Arbitrary large value to offset axes
             float xy = Mathf.PerlinNoise(x, y);
             float yz = Mathf.PerlinNoise(y + offset, z);
             float xz = Mathf.PerlinNoise(x + offset * 2, z);
@@ -131,11 +152,16 @@ namespace MarchingCubes.Scripts
             Vector3 planetCenter = Vector3.zero;
             float distanceFromCenter = Vector3.Distance(position, planetCenter);
 
-            // Adjust the density calculation with Noise
+            // Calculate a noise value for the current position
             float noiseValue = PerlinNoise3D(position.x * noiseScale, position.y * noiseScale, position.z * noiseScale);
 
-            // Density combines distance and noise for shaping the planet
-            return (planetRadius - distanceFromCenter) + noiseValue * noiseAmplitude;
+            // Ensure the noise effect doesn't push the density too far
+            float clampedNoise = Mathf.Clamp(noiseValue * noiseAmplitude, -planetRadius * 0.1f, planetRadius * 0.1f);
+
+            // Combine the base density with the noise, ensuring the density remains within reasonable bounds
+            float density = (planetRadius - distanceFromCenter) + clampedNoise;
+
+            return density;
         }
 
         // Marching cubes algorithm to generate vertices and triangles based on the voxel grid
@@ -188,7 +214,10 @@ namespace MarchingCubes.Scripts
         // Interpolation function to find the vertex position along the edge
         private Vector3 InterpolateEdge(Vector3 cornerA, Vector3 cornerB, float valueA, float valueB)
         {
-            float t = valueA / (valueA - valueB);
+            if (Mathf.Approximately(valueA, valueB))
+                return cornerA;  // Avoid division by zero or weird results if both values are the same
+
+            float t = (0 - valueA) / (valueB - valueA);  // Note the zero-crossing at the isosurface
             return cornerA + t * (cornerB - cornerA);
         }
 
@@ -207,20 +236,13 @@ namespace MarchingCubes.Scripts
         {
             if (showDebug)
             {
-                // Calculate the voxel size relative to the planet's radius
-                float voxelSize = planetRadius / gridSize;
-
-                // Calculate the grid center offset to center the planet at (0, 0, 0)
-                Vector3 gridCenterOffset = new Vector3(gridSize / 2f, gridSize / 2f, gridSize / 2f) * voxelSize;
-
-                // Define the grid's boundary (a cube enclosing the grid)
-                Vector3 gridMin = -gridCenterOffset; // Bottom-left corner
-                Vector3 gridMax = gridMin + new Vector3(gridSize, gridSize, gridSize) * voxelSize; // Top-right corner
-
-                // Draw the boundary of the voxel grid (a wire cube)
                 Gizmos.color = Color.green;
-                Gizmos.DrawWireCube(Vector3.zero,
-                    new Vector3(gridMax.x - gridMin.x, gridMax.y - gridMin.y, gridMax.z - gridMin.z));
+                Vector3 gridCenter = transform.position;  // Properly center on the object's position
+                Gizmos.DrawWireCube(gridCenter, new Vector3(gridSize * voxelSize, gridSize * voxelSize, gridSize * voxelSize));
+
+                // Also draw a sphere representing the intended planet radius
+                Gizmos.color = Color.cyan;
+                Gizmos.DrawWireSphere(transform.position, planetRadius);
             }
         }
     }
