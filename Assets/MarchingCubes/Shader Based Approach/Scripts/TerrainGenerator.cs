@@ -11,13 +11,18 @@ public class TerrainGenerator : MonoBehaviour
     public Material terrainMaterial;
     
     [Header("Generation Parameters")]
-    public int gridSize = 32;
-    public float voxelSize = 0.5f;
-    public float planetRadius = 8f;
+    public int gridSize = 48;
+    public float voxelSize = 0.2f;
+    public float planetRadius = 0.8f;
     
     [Header("Noise Parameters")]
-    public float noiseScale = 0.1f;
-    public float noiseAmplitude = 1.0f;
+    public float noiseScale = 1.0f;
+    public float noiseAmplitude = 0.0f;
+    
+    [Header("Deprecated Parameters")]
+    [Tooltip("Controls the space around the sphere. Increase if seeing clipping.")]
+    [Range(0.0f, 20.0f)]
+    public float paddingFactor = 2.0f;
     
     // Compute buffers
     private ComputeBuffer _voxelBuffer;
@@ -26,13 +31,10 @@ public class TerrainGenerator : MonoBehaviour
     private ComputeBuffer _vertexCounterBuffer;
     private ComputeBuffer _triangleCounterBuffer;
     
-    // Debug buffers
-    private ComputeBuffer _debugBuffer;
-    
     // Mesh components
     private MeshFilter _meshFilter;
     private MeshRenderer _meshRenderer;
-
+    
     void Start()
     {
         InitializeMeshComponents();
@@ -43,6 +45,15 @@ public class TerrainGenerator : MonoBehaviour
     void OnDestroy()
     {
         ReleaseBuffers();
+    }
+
+    private void OnValidate()
+    {
+        if (Application.isPlaying)
+        {
+            Debug.Log($"Parameters changed - Padding: {paddingFactor}");
+            GenerateTerrain();
+        }
     }
     
     private void InitializeMeshComponents()
@@ -69,9 +80,6 @@ public class TerrainGenerator : MonoBehaviour
         _triangleBuffer = new ComputeBuffer(maxTriangles, sizeof(int));
         _vertexCounterBuffer = new ComputeBuffer(1, sizeof(int));
         _triangleCounterBuffer = new ComputeBuffer(1, sizeof(int));
-        
-        // Initialize debug buffer
-        _debugBuffer = new ComputeBuffer(numVoxels, sizeof(float));
     }
     
     private void ReleaseBuffers()
@@ -81,15 +89,14 @@ public class TerrainGenerator : MonoBehaviour
         if (_triangleBuffer != null) _triangleBuffer.Release();
         if (_vertexCounterBuffer != null) _vertexCounterBuffer.Release();
         if (_triangleCounterBuffer != null) _triangleCounterBuffer.Release();
-        if (_debugBuffer != null) _debugBuffer.Release();
     }
     
     private void GenerateTerrain()
     {
         GenerateDensity();
-        DebugDensityValues(); // Add debug step
+        DebugDensityValues();
         RunMarchingCubes();
-        DebugMarchingCubes(); // Add debug step
+        DebugMarchingCubes();
         CreateMesh();
     }
     
@@ -97,16 +104,18 @@ public class TerrainGenerator : MonoBehaviour
     {
         int kernelIndex = densityMapShader.FindKernel("CSMain");
         
+        Debug.Log($"Setting padding factor: {paddingFactor}");
+        
         densityMapShader.SetInt("gridSize", gridSize);
         densityMapShader.SetFloat("noiseScale", noiseScale);
         densityMapShader.SetFloat("noiseAmplitude", noiseAmplitude);
         densityMapShader.SetFloat("planetRadius", planetRadius);
+        densityMapShader.SetFloat("paddingFactor", paddingFactor);
         
         densityMapShader.SetBuffer(kernelIndex, "densityMap", _voxelBuffer);
         
         int threadGroups = Mathf.CeilToInt(gridSize / 8.0f);
         densityMapShader.Dispatch(kernelIndex, threadGroups, threadGroups, threadGroups);
-        
         Debug.Log($"Dispatched density shader with {threadGroups} thread groups");
     }
     
@@ -131,13 +140,15 @@ public class TerrainGenerator : MonoBehaviour
     {
         int kernelIndex = marchingCubesShader.FindKernel("CSMain");
         
-        // Reset counters
+        Debug.Log($"Using padding factor in marching cubes: {paddingFactor}");
+        
         _vertexCounterBuffer.SetData(new int[] { 0 });
         _triangleCounterBuffer.SetData(new int[] { 0 });
         
         marchingCubesShader.SetInt("gridSize", gridSize);
         marchingCubesShader.SetFloat("voxelSize", voxelSize);
         marchingCubesShader.SetFloat("isoLevel", 0.0f);
+        marchingCubesShader.SetFloat("paddingFactor", paddingFactor);
         
         marchingCubesShader.SetBuffer(kernelIndex, "densityMap", _voxelBuffer);
         marchingCubesShader.SetBuffer(kernelIndex, "vertices", _vertexBuffer);
@@ -162,7 +173,6 @@ public class TerrainGenerator : MonoBehaviour
     
     private void CreateMesh()
     {
-        // Read counters
         int[] vertexCount = new int[1];
         int[] triangleCount = new int[1];
         _vertexCounterBuffer.GetData(vertexCount);
@@ -176,14 +186,12 @@ public class TerrainGenerator : MonoBehaviour
             return;
         }
         
-        // Read vertices and triangles
         Vector3[] vertices = new Vector3[vertexCount[0]];
         int[] triangles = new int[triangleCount[0]];
         
         _vertexBuffer.GetData(vertices);
         _triangleBuffer.GetData(triangles);
         
-        // Create mesh
         Mesh mesh = new Mesh();
         mesh.indexFormat = IndexFormat.UInt32;
         mesh.vertices = vertices;
@@ -193,10 +201,5 @@ public class TerrainGenerator : MonoBehaviour
         _meshFilter.mesh = mesh;
         
         Debug.Log($"Mesh created with bounds: {mesh.bounds}");
-    }
-
-    public void RegenerateTerrain()
-    {
-        GenerateTerrain();
     }
 }

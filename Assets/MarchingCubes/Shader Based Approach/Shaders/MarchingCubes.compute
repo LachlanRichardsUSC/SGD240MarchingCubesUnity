@@ -2,123 +2,108 @@
 
 #include "MarchingCubesTable.compute"
 
-// Buffers
 StructuredBuffer<float> densityMap;
 RWStructuredBuffer<float3> vertices;
 RWStructuredBuffer<int> triangles;
 RWStructuredBuffer<int> vertexCounter;
 RWStructuredBuffer<int> triangleCounter;
 
-// Parameters
 int gridSize;
 float voxelSize;
 float isoLevel;
+float paddingFactor;
 
-// Helper function to get density value
 float SampleDensity(uint3 pos)
 {
-    return densityMap[pos.x + gridSize * (pos.y + gridSize * pos.z)];
+    if (any(pos >= uint3(gridSize, gridSize, gridSize))) return 1.0;
+    int index = pos.x + gridSize * (pos.y + gridSize * pos.z);
+    return densityMap[index];
 }
 
-// Helper function to get corner positions for a voxel
-uint3 GetVoxelCorner(uint3 basePos, int cornerIndex)
+float3 GetWorldPos(uint3 pos)
+{
+    float3 gridPos = (float3)pos;
+    float3 centered = gridPos - float3(gridSize/2, gridSize/2, gridSize/2);
+    return centered * (voxelSize / paddingFactor);
+}
+
+float3 InterpolateVerts(float3 pos1, float3 pos2, float val1, float val2)
+{
+    float t = (isoLevel - val1) / (val2 - val1);
+    return lerp(pos1, pos2, t);
+}
+
+uint3 GetCubeCorner(uint3 pos, int cornerIndex)
 {
     uint3 cornerOffsets[8] = {
-        uint3(0, 0, 0),
-        uint3(1, 0, 0),
-        uint3(0, 1, 0),
-        uint3(1, 1, 0),
-        uint3(0, 0, 1),
-        uint3(1, 0, 1),
-        uint3(0, 1, 1),
-        uint3(1, 1, 1)
+        uint3(0, 0, 0), uint3(1, 0, 0), uint3(1, 1, 0), uint3(0, 1, 0),
+        uint3(0, 0, 1), uint3(1, 0, 1), uint3(1, 1, 1), uint3(0, 1, 1)
     };
-    return basePos + cornerOffsets[cornerIndex];
-}
-
-// Helper function to get world position
-float3 GetWorldPosition(uint3 pos)
-{
-    return (float3)(pos - uint3(gridSize/2, gridSize/2, gridSize/2)) * voxelSize;
-}
-
-// Helper function to interpolate between vertices
-float3 InterpolateVerts(float3 v1, float3 v2, float d1, float d2)
-{
-    float t = (isoLevel - d1) / (d2 - d1);
-    return v1 + t * (v2 - v1);
+    return pos + cornerOffsets[cornerIndex];
 }
 
 [numthreads(8,8,8)]
 void CSMain(uint3 id : SV_DispatchThreadID)
 {
-    // Check if we're within bounds
-    if (any(id >= uint3(gridSize-1, gridSize-1, gridSize-1))) return;
+    uint3 maxSize = uint3(gridSize - 1, gridSize - 1, gridSize - 1);
+    if (any(id >= maxSize)) return;
 
-    // Get densities for current cube
     float cubeValues[8];
-    float3 positions[8];
+    float3 cubePositions[8];
     
-    // Sample all 8 corners of the cube
     for (int i = 0; i < 8; i++)
     {
-        uint3 corner = GetVoxelCorner(id, i);
-        cubeValues[i] = SampleDensity(corner);
-        positions[i] = GetWorldPosition(corner);
+        uint3 cornerPos = GetCubeCorner(id, i);
+        cubeValues[i] = SampleDensity(cornerPos);
+        cubePositions[i] = GetWorldPos(cornerPos);
     }
 
-    // Calculate cube index
     int cubeIndex = 0;
     for (int i = 0; i < 8; i++)
     {
-        if (cubeValues[i] < isoLevel)
+        if (cubeValues[i] > isoLevel)
         {
             cubeIndex |= 1 << i;
         }
     }
 
-    // Early exit if cube is entirely inside or outside surface
-    if (edgeTable[cubeIndex] == 0) return;
+    int edgeFlags = edgeTable[cubeIndex];
+    if (edgeFlags == 0) return;
 
-    // Find vertices where surface intersects edges
     float3 vertList[12];
     for (int i = 0; i < 12; i++)
     {
-        if ((edgeTable[cubeIndex] & (1 << i)) != 0)
+        if (edgeFlags & (1 << i))
         {
             int v1 = cornerIndexAFromEdge[i];
             int v2 = cornerIndexBFromEdge[i];
             
             vertList[i] = InterpolateVerts(
-                positions[v1],
-                positions[v2],
+                cubePositions[v1],
+                cubePositions[v2],
                 cubeValues[v1],
                 cubeValues[v2]
             );
         }
     }
 
-    // Create triangles
-    int numTriangles = 0;
     for (int i = 0; triangulation[cubeIndex][i] != -1; i += 3)
     {
-        // Get starting indices for vertices and triangles
-        int vertexStart;
-        InterlockedAdd(vertexCounter[0], 3, vertexStart);
+        int vertexIndex;
+        InterlockedAdd(vertexCounter[0], 3, vertexIndex);
         
-        // Add three vertices
         for (int j = 0; j < 3; j++)
         {
             int edgeIndex = triangulation[cubeIndex][i + j];
-            vertices[vertexStart + j] = vertList[edgeIndex];
+            vertices[vertexIndex + j] = vertList[edgeIndex];
         }
         
-        // Add triangle indices
-        int triStart;
-        InterlockedAdd(triangleCounter[0], 3, triStart);
+        int triIndex;
+        InterlockedAdd(triangleCounter[0], 3, triIndex);
+        
         for (int j = 0; j < 3; j++)
         {
-            triangles[triStart + j] = vertexStart + j;
+            triangles[triIndex + j] = vertexIndex + j;
         }
     }
 }

@@ -6,18 +6,9 @@
   <component name="ChangeListManager">
     <list default="true" id="cb6202d1-e665-4e3c-89b5-84d12418bc6b" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.MarchingCubes/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.MarchingCubes/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/MarchingCubes/CPU Based Approach/Channel.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/MarchingCubes/CPU Based Approach/Channel.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/MarchingCubes/CPU Based Approach/ComputeHelper.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/MarchingCubes/CPU Based Approach/ComputeHelper.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/MarchingCubes/CPU Based Approach/ComputeShaders/MarchingCubesTable.compute" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/MarchingCubes/CPU Based Approach/ComputeShaders/MarchingCubesTable.compute.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/MarchingCubes/CPU Based Approach/ComputeShaders/Noise.compute" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/MarchingCubes/CPU Based Approach/ComputeShaders/Noise.compute.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/MarchingCubes/CPU Based Approach/VertexData.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/MarchingCubes/CPU Based Approach/VertexData.cs.meta" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/MarchingCubes/Shader Based Approach/Scripts/TerrainGenerator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/MarchingCubes/Shader Based Approach/Scripts/TerrainGenerator.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scenes/SampleScene.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/SampleScene.unity" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/MarchingCubes/Shader Based Approach/Shaders/DensityMap.compute" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/MarchingCubes/Shader Based Approach/Shaders/DensityMap.compute" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/MarchingCubes/Shader Based Approach/Shaders/MarchingCubes.compute" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/MarchingCubes/Shader Based Approach/Shaders/MarchingCubes.compute" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -118,7 +109,7 @@
       <workItem from="1729701611179" duration="116000" />
       <workItem from="1729701735796" duration="8804000" />
       <workItem from="1729788249522" duration="1452000" />
-      <workItem from="1729789727791" duration="4443000" />
+      <workItem from="1729789727791" duration="8654000" />
     </task>
     <servers />
   </component>
