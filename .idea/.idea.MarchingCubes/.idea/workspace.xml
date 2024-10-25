@@ -6,9 +6,12 @@
   <component name="ChangeListManager">
     <list default="true" id="cb6202d1-e665-4e3c-89b5-84d12418bc6b" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.MarchingCubes/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.MarchingCubes/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/MarchingCubes/CPU Based Approach/PlanetGenerator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/MarchingCubes/CPU Based Approach/PlanetGenerator.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/MarchingCubes/Shader Based Approach/Scripts/TerrainGenerator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/MarchingCubes/Shader Based Approach/Scripts/TerrainGenerator.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/MarchingCubes/Shader Based Approach/Shaders/DensityMap.compute" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/MarchingCubes/Shader Based Approach/Shaders/DensityMap.compute" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/MarchingCubes/Shader Based Approach/Shaders/MarchingCubes.compute" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/MarchingCubes/Shader Based Approach/Shaders/MarchingCubes.compute" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Materials/PlanetMaterial.mat" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Materials/PlanetMaterial.mat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scenes/SampleScene.unity" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scenes/SampleScene.unity.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ProjectSettings/EditorBuildSettings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/EditorBuildSettings.asset" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -109,7 +112,9 @@
       <workItem from="1729701611179" duration="116000" />
       <workItem from="1729701735796" duration="8804000" />
       <workItem from="1729788249522" duration="1452000" />
-      <workItem from="1729789727791" duration="8654000" />
+      <workItem from="1729789727791" duration="11157000" />
+      <workItem from="1729802847248" duration="823000" />
+      <workItem from="1729874193871" duration="313000" />
     </task>
     <servers />
   </component>

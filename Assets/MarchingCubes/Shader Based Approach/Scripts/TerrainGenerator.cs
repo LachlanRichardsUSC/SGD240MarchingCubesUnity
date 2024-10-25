@@ -19,6 +19,15 @@ public class TerrainGenerator : MonoBehaviour
     public float noiseScale = 1.0f;
     public float noiseAmplitude = 0.0f;
     
+    // This stuff is still really buggy
+    [Header("Debug Visualization")]
+    public bool showGridBounds = true;
+    public bool showVoxels = false;
+    public bool showPlanetRadius = true;
+    public Color gridColor = new Color(0.5f, 0.5f, 1f, 0.2f);
+    public Color voxelColor = new Color(1f, 0.5f, 0.5f, 0.1f);
+    public Color radiusColor = new Color(0.5f, 1f, 0.5f, 0.4f);
+    
     [Header("Deprecated Parameters")]
     [Tooltip("Controls the space around the sphere. Increase if seeing clipping.")]
     [Range(0.0f, 20.0f)]
@@ -47,6 +56,96 @@ public class TerrainGenerator : MonoBehaviour
         ReleaseBuffers();
     }
 
+     private void OnDrawGizmos()
+    {
+        if (!Application.isPlaying)
+            return;
+
+        Vector3 gridCenter = transform.position;
+        float totalSize = gridSize * voxelSize ;
+        float halfSize = totalSize / 2f;
+
+        // Draw Grid Bounds
+        if (showGridBounds)
+        {
+            Gizmos.color = gridColor;
+            Gizmos.DrawWireCube(gridCenter, new Vector3(totalSize, totalSize, totalSize));
+        }
+
+        // Draw Voxel Grid
+        if (showVoxels)
+        {
+            Gizmos.color = voxelColor;
+            
+            // Draw vertical lines
+            for (int x = 0; x <= gridSize; x++)
+            {
+                for (int z = 0; z <= gridSize; z++)
+                {
+                    float xPos = -halfSize + x * voxelSize;
+                    float zPos = -halfSize + z * voxelSize;
+                    Vector3 start = gridCenter + new Vector3(xPos, -halfSize, zPos);
+                    Vector3 end = gridCenter + new Vector3(xPos, halfSize, zPos);
+                    Gizmos.DrawLine(start, end);
+                }
+            }
+
+            // Draw horizontal lines
+            for (int y = 0; y <= gridSize; y++)
+            {
+                float yPos = -halfSize + y * voxelSize;
+                
+                // Draw X lines
+                for (int x = 0; x <= gridSize; x++)
+                {
+                    float xPos = -halfSize + x * voxelSize;
+                    Vector3 start = gridCenter + new Vector3(xPos, yPos, -halfSize);
+                    Vector3 end = gridCenter + new Vector3(xPos, yPos, halfSize);
+                    Gizmos.DrawLine(start, end);
+                }
+
+                // Draw Z lines
+                for (int z = 0; z <= gridSize; z++)
+                {
+                    float zPos = -halfSize + z * voxelSize;
+                    Vector3 start = gridCenter + new Vector3(-halfSize, yPos, zPos);
+                    Vector3 end = gridCenter + new Vector3(halfSize, yPos, zPos);
+                    Gizmos.DrawLine(start, end);
+                }
+            }
+        }
+
+        // Draw Planet Radius
+        if (showPlanetRadius)
+        {
+            Gizmos.color = radiusColor;
+            float scaledRadius = (planetRadius / paddingFactor) * (gridSize * voxelSize * 0.5f);
+            DrawWireSphere(gridCenter, scaledRadius);
+        }
+    }
+
+    private void DrawWireSphere(Vector3 center, float radius)
+    {
+        // Draw three circles for XY, XZ, and YZ planes
+        DrawCircle(center, radius, Vector3.right, Vector3.up);    // XY plane
+        DrawCircle(center, radius, Vector3.right, Vector3.forward); // XZ plane
+        DrawCircle(center, radius, Vector3.up, Vector3.forward);    // YZ plane
+    }
+
+    private void DrawCircle(Vector3 center, float radius, Vector3 right, Vector3 up)
+    {
+        const int segments = 32;
+        Vector3 previousPoint = center + right * radius;
+
+        for (int i = 1; i <= segments; i++)
+        {
+            float angle = i * 2 * Mathf.PI / segments;
+            Vector3 nextPoint = center + (right * Mathf.Cos(angle) + up * Mathf.Sin(angle)) * radius;
+            Gizmos.DrawLine(previousPoint, nextPoint);
+            previousPoint = nextPoint;
+        }
+    }
+    
     private void OnValidate()
     {
         if (Application.isPlaying)
