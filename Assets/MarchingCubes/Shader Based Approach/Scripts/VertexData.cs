@@ -1,18 +1,9 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using Unity.Mathematics;
 
-public class VertexData : MonoBehaviour
+public struct VertexData
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    public Vector3 position;
+    public Vector3 normal;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 }

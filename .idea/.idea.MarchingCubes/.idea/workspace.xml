@@ -6,7 +6,11 @@
   <component name="ChangeListManager">
     <list default="true" id="cb6202d1-e665-4e3c-89b5-84d12418bc6b" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.MarchingCubes/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.MarchingCubes/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/MarchingCubes/CPU Based Approach/PlanetGenerator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/MarchingCubes/CPU Based Approach/PlanetGenerator.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/MarchingCubes/Shader Based Approach/Scripts/TerrainGenerator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/MarchingCubes/Shader Based Approach/Scripts/TerrainGenerator.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/MarchingCubes/Shader Based Approach/Scripts/VertexData.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/MarchingCubes/Shader Based Approach/Scripts/VertexData.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Materials/PlanetMaterial.mat" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Materials/PlanetMaterial.mat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scenes/CPU.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/CPU.unity" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scenes/ComputeShader.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/ComputeShader.unity" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -20,9 +24,10 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="file://$PROJECT_DIR$/Assets/MarchingCubes/CPU Based Approach/CustomNoise.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/MarchingCubes/Shader Based Approach/Scripts/VertexData.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/MarchingCubes/Shader Based Approach/Shaders/Noise.compute" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.ide.rider@3.0.31/Rider/Editor/RiderScriptEditor.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$USER_HOME$/Downloads/Terraforming-main/Assets/Marching Cubes/Scripts/GenTest.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="ProblemsViewState">
     <option name="selectedTabId" value="CurrentFile" />
@@ -110,7 +115,8 @@
       <workItem from="1729789727791" duration="11157000" />
       <workItem from="1729802847248" duration="823000" />
       <workItem from="1729874193871" duration="1393000" />
-      <workItem from="1729875609276" duration="3002000" />
+      <workItem from="1729875609276" duration="12260000" />
+      <workItem from="1729888317624" duration="1134000" />
     </task>
     <servers />
   </component>

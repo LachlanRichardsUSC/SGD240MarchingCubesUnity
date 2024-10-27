@@ -444,10 +444,10 @@ MonoBehaviour:
   marchingCubesShader: {fileID: 7200000, guid: f3de4a9b67304314f837c99e785f8d84, type: 3}
   densityMapShader: {fileID: 7200000, guid: e18a70046d2ead64ab2825139fad6916, type: 3}
   terrainMaterial: {fileID: 2100000, guid: 5bc73838c53f808418e05d3c9485ed36, type: 2}
-  gridSize: 256
-  voxelSize: 0.1
+  gridSize: 64
+  voxelSize: 1
   planetRadius: 0.8
-  noiseScale: 0.5
+  noiseScale: 0.1
   noiseAmplitude: 1
   showGridBounds: 0
   showVoxels: 0
