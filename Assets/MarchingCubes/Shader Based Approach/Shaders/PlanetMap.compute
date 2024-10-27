@@ -1,0 +1,84 @@
+// Density.compute: A compute shader that generates a 3D density texture for procedural terrain using noise.
+// The shader computes density values based on a combination of a spherical base field and Fractal Brownian Motion (FBM) noise.
+// The resulting density values are stored in a 3D texture, which is used for terrain generation with the marching cubes algorithm.
+
+#pragma kernel CSMain
+#include "Assets/Includes/Noise.compute"
+
+// Texture for storing density values
+RWTexture3D<float> DensityTexture;
+int textureSize;
+int borderWidth;
+
+// Generation parameters
+float planetSize;
+float noiseScale;
+float noiseHeightMultiplier;
+
+
+// Generates Fractal Brownian Motion (FBM) noise for more natural-looking terrain.
+float fbm(int numLayers, float lacunarity, float persistence, float scale, float3 pos) {
+    float noise = 0;
+    float frequency = scale / 100;
+    float amplitude = 1;
+
+    for (int i = 0; i < numLayers; i++) {
+        // Get noise value and transform to [0,1] range
+        float n = 1 - abs(snoise(pos * frequency) * 2 - 1);
+        noise += n * amplitude;
+
+        // Adjust frequency and amplitude for next octave
+        amplitude *= persistence;
+        frequency *= lacunarity;
+    }
+
+    return noise;
+}
+
+
+// Calculates the density value at a given cell coordinate by combining a base spherical density field with FBM noise.
+float calculateDensity(int3 cell) {
+    // Convert cell position to world position
+    float3 worldPos = (cell / float(textureSize - 1.0f) - 0.5f) * planetSize;
+
+    // Calculate base spherical density field
+    float halfSize = planetSize / 2;
+    float maxDistance = length(float3(halfSize, halfSize, halfSize));
+    float baseDensity = length(worldPos) / (maxDistance + 1) - 0.5;
+
+    // Add noise detail to the density field
+    float noiseValue = fbm(6,         // Number of octaves
+                          2,          // Lacunarity - how quickly frequency increases
+                          0.5,        // Persistence - how quickly amplitude decreases
+                          noiseScale, // Base noise scale
+                          worldPos    // Position input
+                          );
+
+    // Combine base density with noise
+    return baseDensity + noiseValue * noiseHeightMultiplier;
+}
+
+[numthreads(8,8,8)]
+void CSMain(int3 id : SV_DispatchThreadID) {
+    // Early exit if outside texture bounds
+    if (id.x >= textureSize || id.y >= textureSize || id.z >= textureSize) {
+        return;
+    }
+
+    float density;
+
+    // Create solid border around the volume
+    if (id.x >= textureSize - borderWidth || id.y >= textureSize - borderWidth || 
+        id.z >= textureSize - borderWidth) {
+        density = 1;
+    }
+    else if (id.x <= borderWidth || id.y <= borderWidth || id.z <= borderWidth) {
+        density = 1;
+    }
+    else {
+        density = calculateDensity(id);
+    }
+
+    // Store the calculated density value in the 3D texture
+    DensityTexture[id] = density;
+}

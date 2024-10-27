@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace MarchingCubes.Scripts
+namespace MarchingCubes.CPU_Based_Approach
 {
     public class PlanetGenerator : MonoBehaviour
     {

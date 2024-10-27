@@ -6,8 +6,23 @@
   <component name="ChangeListManager">
     <list default="true" id="cb6202d1-e665-4e3c-89b5-84d12418bc6b" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.MarchingCubes/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.MarchingCubes/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/MarchingCubes/CPU Based Approach/ComputeShaders.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/MarchingCubes/CPU Based Approach/FreeCamController.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/MarchingCubes/CPU Based Approach/FreeCamController.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/MarchingCubes/CPU Based Approach/MarchingCubesTable.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/MarchingCubes/CPU Based Approach/MarchingCubesTable.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/MarchingCubes/CPU Based Approach/PlanetGenerator.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/MarchingCubes/CPU Based Approach/PlanetGenerator.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/MarchingCubes/Shader Based Approach/Scripts/Chunk.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/MarchingCubes/Shader Based Approach/Scripts/Chunk.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/MarchingCubes/Shader Based Approach/Scripts/TerrainGenerator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/MarchingCubes/Shader Based Approach/Scripts/TerrainGenerator.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/MarchingCubes/Shader Based Approach/Scripts/VertexData.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/MarchingCubes/Shader Based Approach/Scripts/VertexData.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/MarchingCubes/Shader Based Approach/Shaders/DensityMap.compute" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/MarchingCubes/Shader Based Approach/Shaders/DensityMap.compute.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/MarchingCubes/Shader Based Approach/Shaders/MarchingCubes.compute" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/MarchingCubes/Shader Based Approach/Shaders/MarchingCubes.compute" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/MarchingCubes/Shader Based Approach/Shaders/MarchingCubesTable.compute" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/MarchingCubes/Shader Based Approach/Shaders/MarchingCubesTable.compute.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/MarchingCubes/Shader Based Approach/Shaders/Noise.compute" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/MarchingCubes/Shader Based Approach/Shaders/Noise.compute.meta" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Materials/PlanetMaterial.mat" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Materials/PlanetMaterial.mat" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scenes/CPU.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/CPU.unity" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scenes/ComputeShader.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/ComputeShader.unity" afterDir="false" />
@@ -24,8 +39,8 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/Assets/MarchingCubes/CPU Based Approach/MarchingCubesTable.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/MarchingCubes/Shader Based Approach/Scripts/VertexData.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/MarchingCubes/Shader Based Approach/Shaders/Noise.compute" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.ide.rider@3.0.31/Rider/Editor/RiderScriptEditor.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$USER_HOME$/Downloads/Terraforming-main/Assets/Marching Cubes/Scripts/GenTest.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
@@ -117,6 +132,8 @@
       <workItem from="1729874193871" duration="1393000" />
       <workItem from="1729875609276" duration="12260000" />
       <workItem from="1729888317624" duration="1134000" />
+      <workItem from="1730004381578" duration="3368000" />
+      <workItem from="1730036601864" duration="835000" />
     </task>
     <servers />
   </component>

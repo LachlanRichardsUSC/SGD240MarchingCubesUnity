@@ -276,8 +276,8 @@ MonoBehaviour:
   speedIncrement: 25
   minSpeed: 2
   maxSpeed: 500
-  lookSpeed: 2
   sprintMultiplier: 2
+  lookSpeed: 2
   invertY: 0
 --- !u!1 &410087039
 GameObject:
@@ -408,7 +408,7 @@ GameObject:
   - component: {fileID: 602428152}
   - component: {fileID: 602428154}
   m_Layer: 0
-  m_Name: PlanetObject
+  m_Name: ComputePlanetObject
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -441,21 +441,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 791ca5162980d954b981d84c05256cc0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  marchingCubesShader: {fileID: 7200000, guid: f3de4a9b67304314f837c99e785f8d84, type: 3}
-  densityMapShader: {fileID: 7200000, guid: e18a70046d2ead64ab2825139fad6916, type: 3}
-  terrainMaterial: {fileID: 2100000, guid: 5bc73838c53f808418e05d3c9485ed36, type: 2}
-  gridSize: 64
-  voxelSize: 1
-  planetRadius: 0.8
-  noiseScale: 0.1
-  noiseAmplitude: 1
-  showGridBounds: 0
-  showVoxels: 0
-  showPlanetRadius: 0
-  gridColor: {r: 0.5, g: 0.5, b: 1, a: 0.2}
-  voxelColor: {r: 1, g: 0.5, b: 0.5, a: 0.1}
-  radiusColor: {r: 0.5, g: 1, b: 0.5, a: 0.4}
-  paddingFactor: 0.1
+  numChunks: 10
+  numPointsPerAxis: 32
+  boundsSize: 500
+  borderWidth: 1
+  isoLevel: 0
+  useFlatShading: 0
+  noiseScale: 0.75
+  noiseHeightMultiplier: 0.02
+  useBlur: 1
+  blurRadius: 1
+  meshCompute: {fileID: 7200000, guid: f3de4a9b67304314f837c99e785f8d84, type: 3}
+  densityCompute: {fileID: 7200000, guid: 41b3a140912596f428d35fbdc01a272b, type: 3}
+  blurCompute: {fileID: 7200000, guid: ae1ae60912559604bb90c4ae02c46276, type: 3}
+  material: {fileID: 2100000, guid: 5bc73838c53f808418e05d3c9485ed36, type: 2}
 --- !u!1 &832575517
 GameObject:
   m_ObjectHideFlags: 0

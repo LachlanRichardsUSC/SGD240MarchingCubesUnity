@@ -1,4 +1,4 @@
-namespace MarchingCubes.Scripts
+namespace MarchingCubes.CPU_Based_Approach
 {
     public static class MarchingCubesTable
     {

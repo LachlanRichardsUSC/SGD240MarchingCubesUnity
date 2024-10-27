@@ -1,235 +1,257 @@
 using UnityEngine;
-using UnityEngine.Rendering;
 
+/// <summary>
+/// Manages the generation of procedural terrain using marching cubes and compute shaders.
+/// </summary>
+/// <remarks>
+/// This class initializes textures, dispatches compute shaders for density and blur generation,
+/// and creates terrain chunks based on generated vertex data.
+/// </remarks>
 public class TerrainGenerator : MonoBehaviour
 {
-    [Header("Compute Shaders")]
-    public ComputeShader marchingCubesShader;
-    public ComputeShader densityMapShader;
-    
-    [Header("Rendering")]
-    public Material terrainMaterial;
-    
-    [Header("Generation Parameters")]
-    public int gridSize = 48;
-    public float voxelSize = 0.2f;
-    public float planetRadius = 0.8f;
-    
-    [Header("Noise Parameters")]
-    public float noiseScale = 1.0f;
-    public float noiseAmplitude = 0.0f;
-    
-    [Header("Deprecated Parameters")]
-    [Tooltip("Controls the space around the sphere. Increase if seeing clipping.")]
-    [Range(0.0f, 20.0f)]
-    public float paddingFactor = 2.0f;
-    
-    // Compute buffers
-    private ComputeBuffer _voxelBuffer;
-    private ComputeBuffer _vertexBuffer;
+    [Header("Generation Settings")]
+    [SerializeField] private int numChunks = 10;
+    [SerializeField] private int numPointsPerAxis = 32;
+    [SerializeField] private float boundsSize = 500;
+    [SerializeField] private int borderWidth = 1;
+    [SerializeField] private float isoLevel = 0.0f;
+    [SerializeField] private bool useFlatShading = false;
+
+    [Header("Noise Settings")]
+    [SerializeField] private float noiseScale = 0.75f;
+    [SerializeField] private float noiseHeightMultiplier = 0.02f;
+
+    [Header("Blur Settings")]
+    [SerializeField] private bool useBlur = true;
+    [SerializeField] [Range(1, 5)] private int blurRadius = 1;
+
+    [Header("References")]
+    [SerializeField] private ComputeShader meshCompute;
+    [SerializeField] private ComputeShader densityCompute;
+    [SerializeField] private ComputeShader blurCompute;
+    [SerializeField] private Material material;
+
+    // Public properties for external access
+    public int NumPointsPerAxis => numPointsPerAxis;
+    public float BoundsSize => boundsSize;
+    public RenderTexture DensityTexture => _densityTexture;
+    public Chunk[] Chunks => _chunks;
+
     private ComputeBuffer _triangleBuffer;
-    private ComputeBuffer _vertexCounterBuffer;
-    private ComputeBuffer _triangleCounterBuffer;
-    
-    // Mesh components
-    private MeshFilter _meshFilter;
-    private MeshRenderer _meshRenderer;
-    
+    private ComputeBuffer _triCountBuffer;
+    private RenderTexture _densityTexture;
+    private RenderTexture _blurredDensityTexture;
+    private Chunk[] _chunks;
+    private VertexData[] _vertexDataArray;
+    private int _totalVerts;
+    private System.Diagnostics.Stopwatch _timerGeneration;
+
+    /// <summary>
+    /// Initializes textures, buffers, and chunks, then generates all chunks.
+    /// </summary>
     void Start()
     {
-        InitializeMeshComponents();
-        InitializeBuffers();
-        GenerateTerrain();
+        InitTextures();
+        CreateBuffers();
+        CreateChunks();
+
+        _timerGeneration = System.Diagnostics.Stopwatch.StartNew();
+        GenerateAllChunks();
+        Debug.Log($"Generation Time: {_timerGeneration.ElapsedMilliseconds} ms");
+        Debug.Log($"Total vertices: {_totalVerts}");
     }
-    
+
+    /// <summary>
+    /// Initializes the 3D textures for density and optional blur.
+    /// </summary>
+    void InitTextures()
+    {
+        int size = numChunks * (numPointsPerAxis - 1) + 1;
+        if (numChunks <= 0 || numPointsPerAxis <= 0)
+            throw new System.ArgumentException("Invalid generation parameters");
+
+        Create3DTexture(ref _densityTexture, size, "Density Texture");
+
+        if (useBlur)
+        {
+            Create3DTexture(ref _blurredDensityTexture, size, "Blurred Density Texture");
+        }
+
+        densityCompute.SetTexture(0, "DensityTexture", _densityTexture);
+
+        if (useBlur)
+        {
+            blurCompute.SetTexture(0, "Source", _densityTexture);
+            blurCompute.SetTexture(0, "Result", _blurredDensityTexture);
+            meshCompute.SetTexture(0, "DensityTexture", _blurredDensityTexture);
+        }
+        else
+        {
+            meshCompute.SetTexture(0, "DensityTexture", _densityTexture);
+        }
+    }
+
+    /// <summary>
+    /// Generates all terrain chunks by computing density and creating meshes.
+    /// </summary>
+    void GenerateAllChunks()
+    {
+        _totalVerts = 0;
+        ComputeDensity();
+
+        foreach (var chunk in _chunks)
+        {
+            GenerateChunk(chunk);
+        }
+    }
+
+    /// <summary>
+    /// Computes the density values using the compute shader.
+    /// </summary>
+    void ComputeDensity()
+    {
+        int textureSize = _densityTexture.width;
+
+        densityCompute.SetInt("textureSize", textureSize);
+        densityCompute.SetFloat("planetSize", boundsSize);
+        densityCompute.SetFloat("noiseHeightMultiplier", noiseHeightMultiplier);
+        densityCompute.SetFloat("noiseScale", noiseScale);
+        densityCompute.SetInt("borderWidth", borderWidth);
+
+        ComputeHelper.Dispatch(densityCompute, textureSize, textureSize, textureSize);
+
+        if (useBlur)
+        {
+            blurCompute.SetInt("textureSize", textureSize);
+            blurCompute.SetInt("blurRadius", blurRadius);
+            ComputeHelper.Dispatch(blurCompute, textureSize, textureSize, textureSize);
+        }
+    }
+
+    /// <summary>
+    /// Generates a mesh for a specific chunk based on computed density data.
+    /// </summary>
+    /// <param name="chunk">The chunk for which the mesh is generated.</param>
+    void GenerateChunk(Chunk chunk)
+    {
+        int numVoxelsPerAxis = numPointsPerAxis - 1;
+
+        meshCompute.SetInt("textureSize", _densityTexture.width);
+        meshCompute.SetInt("numPointsPerAxis", numPointsPerAxis);
+        meshCompute.SetFloat("isoLevel", isoLevel);
+        meshCompute.SetFloat("planetSize", boundsSize);
+
+        _triangleBuffer.SetCounterValue(0);
+        meshCompute.SetBuffer(0, "triangles", _triangleBuffer);
+
+        Vector3 chunkCoord = (Vector3)chunk.Id * numVoxelsPerAxis;
+        meshCompute.SetVector("chunkCoord", chunkCoord);
+
+        ComputeHelper.Dispatch(meshCompute, numVoxelsPerAxis, numVoxelsPerAxis, numVoxelsPerAxis);
+
+        int[] vertexCountData = new int[1];
+        _triCountBuffer.SetData(vertexCountData);
+        ComputeBuffer.CopyCount(_triangleBuffer, _triCountBuffer, 0);
+        _triCountBuffer.GetData(vertexCountData);
+
+        int numVertices = vertexCountData[0] * 3;
+
+        _triangleBuffer.GetData(_vertexDataArray, 0, 0, numVertices);
+        chunk.CreateMesh(_vertexDataArray, numVertices, useFlatShading);
+
+        _totalVerts += numVertices;
+    }
+
+    /// <summary>
+    /// Creates the necessary compute buffers for vertex and triangle data.
+    /// </summary>
+    void CreateBuffers()
+    {
+        int numVoxelsPerAxis = numPointsPerAxis - 1;
+        int numVoxels = numVoxelsPerAxis * numVoxelsPerAxis * numVoxelsPerAxis;
+        int maxTriangleCount = numVoxels * 5;
+        int maxVertexCount = maxTriangleCount * 3;
+
+        _triCountBuffer = new ComputeBuffer(1, sizeof(int), ComputeBufferType.Raw);
+        _triangleBuffer = new ComputeBuffer(maxVertexCount, ComputeHelper.GetStride<VertexData>(), ComputeBufferType.Append);
+        _vertexDataArray = new VertexData[maxVertexCount];
+    }
+
+    /// <summary>
+    /// Creates the terrain chunks with appropriate sizes and positions.
+    /// </summary>
+    void CreateChunks()
+    {
+        _chunks = new Chunk[numChunks * numChunks * numChunks];
+        float chunkSize = boundsSize / numChunks;
+        int i = 0;
+
+        for (int y = 0; y < numChunks; y++)
+        {
+            for (int x = 0; x < numChunks; x++)
+            {
+                for (int z = 0; z < numChunks; z++)
+                {
+                    Vector3Int coord = new Vector3Int(x, y, z);
+                    Vector3 centre = new Vector3(
+                        (-(numChunks - 1f) / 2 + x) * chunkSize,
+                        (-(numChunks - 1f) / 2 + y) * chunkSize,
+                        (-(numChunks - 1f) / 2 + z) * chunkSize
+                    );
+
+                    GameObject meshHolder = new GameObject($"Chunk ({x}, {y}, {z})")
+                    {
+                        transform = { parent = transform },
+                        layer = gameObject.layer
+                    };
+
+                    Chunk chunk = new Chunk(coord, centre, chunkSize, meshHolder);
+                    chunk.SetMaterial(material);
+                    _chunks[i] = chunk;
+                    i++;
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Creates a 3D texture with the specified settings.
+    /// </summary>
+    /// <param name="texture">The reference to the RenderTexture to be created.</param>
+    /// <param name="size">The size of each dimension of the 3D texture.</param>
+    /// <param name="densityTexture">The name of the texture for identification.</param>
+    void Create3DTexture(ref RenderTexture texture, int size, string densityTexture)
+    {
+        var format = UnityEngine.Experimental.Rendering.GraphicsFormat.R32_SFloat;
+        if (texture == null || !texture.IsCreated() || texture.width != size || 
+            texture.height != size || texture.volumeDepth != size || texture.graphicsFormat != format)
+        {
+            texture?.Release();
+            texture = new RenderTexture(size, size, 0)
+            {
+                graphicsFormat = format,
+                volumeDepth = size,
+                enableRandomWrite = true,
+                dimension = UnityEngine.Rendering.TextureDimension.Tex3D,
+                wrapMode = TextureWrapMode.Repeat,
+                filterMode = FilterMode.Bilinear,
+                name = densityTexture
+            };
+            texture.Create();
+        }
+    }
+
+    /// <summary>
+    /// Releases allocated buffers and textures when the object is destroyed.
+    /// </summary>
     void OnDestroy()
     {
-        ReleaseBuffers();
-    }
-    
-    
-    private void OnValidate()
-    {
-        if (Application.isPlaying)
-        {
-            Debug.Log($"Parameters changed - Padding: {paddingFactor}");
-            GenerateTerrain();
-        }
-    }
-    
-    private void InitializeMeshComponents()
-    {
-        _meshFilter = gameObject.GetComponent<MeshFilter>();
-        if (_meshFilter == null)
-        {
-            _meshFilter = gameObject.AddComponent<MeshFilter>();
-            Debug.Log("_meshFilter was not found, so a new MeshFilter was added.");
-        }
+        ComputeHelper.Release(_triangleBuffer, _triCountBuffer);
+        _blurredDensityTexture?.Release();
 
-        _meshRenderer = gameObject.GetComponent<MeshRenderer>();
-        if (_meshRenderer == null)
+        foreach (Chunk chunk in _chunks)
         {
-            _meshRenderer = gameObject.AddComponent<MeshRenderer>();
-            Debug.Log("_meshRenderer was not found, so a new MeshRenderer was added.");
+            chunk.Release();
         }
-
-        _meshRenderer.material = terrainMaterial;
-
-        // Add additional checks to ensure that the components were successfully assigned
-        if (_meshFilter == null)
-        {
-            Debug.LogError("Failed to initialize _meshFilter!");
-        }
-        if (_meshRenderer == null)
-        {
-            Debug.LogError("Failed to initialize _meshRenderer!");
-        }
-    }
-    
-    private void InitializeBuffers()
-    {
-        int numVoxels = gridSize * gridSize * gridSize;
-        int maxVertices = numVoxels * 5;
-        int maxTriangles = maxVertices * 3;
-        
-        _voxelBuffer = new ComputeBuffer(numVoxels, sizeof(float));
-        _vertexBuffer = new ComputeBuffer(maxVertices, sizeof(float) * 3);
-        _triangleBuffer = new ComputeBuffer(maxTriangles, sizeof(int));
-        _vertexCounterBuffer = new ComputeBuffer(1, sizeof(int));
-        _triangleCounterBuffer = new ComputeBuffer(1, sizeof(int));
-    }
-    
-    private void ReleaseBuffers()
-    {
-        if (_voxelBuffer != null) _voxelBuffer.Release();
-        if (_vertexBuffer != null) _vertexBuffer.Release();
-        if (_triangleBuffer != null) _triangleBuffer.Release();
-        if (_vertexCounterBuffer != null) _vertexCounterBuffer.Release();
-        if (_triangleCounterBuffer != null) _triangleCounterBuffer.Release();
-    }
-    
-    private void GenerateTerrain()
-    {
-        InitializeBuffers();
-        GenerateDensity();
-        DebugDensityValues();
-        RunMarchingCubes();
-        DebugMarchingCubes();
-        CreateMesh();
-    }
-    
-    private void GenerateDensity()
-    {
-        int kernelIndex = densityMapShader.FindKernel("CSMain");
-        
-        Debug.Log($"Setting padding factor: {paddingFactor}");
-        
-        densityMapShader.SetInt("gridSize", gridSize);
-        densityMapShader.SetFloat("noiseScale", noiseScale);
-        densityMapShader.SetFloat("noiseAmplitude", noiseAmplitude);
-        densityMapShader.SetFloat("planetRadius", planetRadius);
-        densityMapShader.SetFloat("paddingFactor", paddingFactor);
-        
-        densityMapShader.SetBuffer(kernelIndex, "densityMap", _voxelBuffer);
-        
-        int threadGroups = Mathf.CeilToInt(gridSize / 8.0f);
-        densityMapShader.Dispatch(kernelIndex, threadGroups, threadGroups, threadGroups);
-        Debug.Log($"Dispatched density shader with {threadGroups} thread groups");
-    }
-    
-    private void DebugDensityValues()
-    {
-        float[] densityValues = new float[gridSize * gridSize * gridSize];
-        _voxelBuffer.GetData(densityValues);
-        
-        float minDensity = float.MaxValue;
-        float maxDensity = float.MinValue;
-        
-        for(int i = 0; i < densityValues.Length; i++)
-        {
-            minDensity = Mathf.Min(minDensity, densityValues[i]);
-            maxDensity = Mathf.Max(maxDensity, densityValues[i]);
-        }
-        
-        Debug.Log($"Density range: {minDensity} to {maxDensity}");
-    }
-    
-    private void RunMarchingCubes()
-    {
-        int kernelIndex = marchingCubesShader.FindKernel("CSMain");
-        
-        Debug.Log($"Using padding factor in marching cubes: {paddingFactor}");
-        
-        _vertexCounterBuffer.SetData(new int[] { 0 });
-        _triangleCounterBuffer.SetData(new int[] { 0 });
-        
-        marchingCubesShader.SetInt("gridSize", gridSize);
-        marchingCubesShader.SetFloat("voxelSize", voxelSize);
-        marchingCubesShader.SetFloat("isoLevel", 0.0f);
-        marchingCubesShader.SetFloat("paddingFactor", paddingFactor);
-        
-        marchingCubesShader.SetBuffer(kernelIndex, "densityMap", _voxelBuffer);
-        marchingCubesShader.SetBuffer(kernelIndex, "vertices", _vertexBuffer);
-        marchingCubesShader.SetBuffer(kernelIndex, "triangles", _triangleBuffer);
-        marchingCubesShader.SetBuffer(kernelIndex, "vertexCounter", _vertexCounterBuffer);
-        marchingCubesShader.SetBuffer(kernelIndex, "triangleCounter", _triangleCounterBuffer);
-        
-        int threadGroups = Mathf.CeilToInt(gridSize / 8.0f);
-        marchingCubesShader.Dispatch(kernelIndex, threadGroups, threadGroups, threadGroups);
-    }
-    
-    private void DebugMarchingCubes()
-    {
-        int[] vertexCount = new int[1];
-        int[] triangleCount = new int[1];
-        _vertexCounterBuffer.GetData(vertexCount);
-        _triangleCounterBuffer.GetData(triangleCount);
-        
-        Debug.Log($"Generated vertices: {vertexCount[0]}");
-        Debug.Log($"Generated triangles: {triangleCount[0]}");
-    }
-    
-    private void CreateMesh()
-    {
-        int[] vertexCount = new int[1];
-        int[] triangleCount = new int[1];
-        _vertexCounterBuffer.GetData(vertexCount);
-        _triangleCounterBuffer.GetData(triangleCount);
-        
-        Debug.Log($"Creating mesh with {vertexCount[0]} vertices and {triangleCount[0]} triangles");
-        
-        if (vertexCount[0] == 0 || triangleCount[0] == 0)
-        {
-            Debug.LogWarning("No mesh data generated!");
-            return;
-        }
-        
-        if (_vertexBuffer == null)
-        {
-            Debug.LogError("_vertexBuffer is null in CreateMesh!");
-            return;
-        }
-        
-        Vector3[] vertices = new Vector3[vertexCount[0]];
-        int[] triangles = new int[triangleCount[0]];
-        
-        _vertexBuffer.GetData(vertices);
-        _triangleBuffer.GetData(triangles);
-        
-        if (_meshFilter == null)
-        {
-            Debug.LogError("_meshFilter is null in CreateMesh!");
-            return;
-        }
-        
-        Mesh mesh = new Mesh();
-        mesh.indexFormat = IndexFormat.UInt32;
-        mesh.vertices = vertices;
-        mesh.triangles = triangles;
-        mesh.RecalculateNormals();
-        
-        _meshFilter.mesh = mesh;
-        
-        Debug.Log($"Mesh created with bounds: {mesh.bounds}");
     }
 }

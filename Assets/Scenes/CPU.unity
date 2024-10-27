@@ -133,7 +133,7 @@ GameObject:
   - component: {fileID: 430587141}
   - component: {fileID: 430587142}
   m_Layer: 0
-  m_Name: PlanetObject
+  m_Name: CPUPlanetObject
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -167,7 +167,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   planetRadius: 350
-  gridSize: 128
+  gridSize: 92
   useAutoVoxelSize: 1
   manualVoxelSize: 16
   noiseSeed: 0
