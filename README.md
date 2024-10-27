@@ -28,13 +28,19 @@ For each intersected edge, the algorithm interpolates between the two end vertic
 
 ---
 
-## Project Installation
+## Project Installation and Controls
+
+### Installation
 
 1. **Clone or Download the Project**  
    Click the green "Code" button on this repository's main page and select "Download ZIP" or clone the project via Git.  
    ```bash
    git clone https://github.com/YourUsername/SGD240-Planets.git
 2. **Open the project using Unity Version 2023.3.45f1**
+
+### Controls
+
+Players can move the camera upon pressing play by holding W, A, S or D. The player can look around by holding the right mouse button and moving the mouse. There are no other inputs required to test this project.
 
 ---
 
@@ -117,8 +123,15 @@ the power of parallel processing. The code is typically 10x faster than the CPU 
 The bulk of my time on this Project from then onwards was spent optimizing the compute shader approach, as I felt I could not do much more with the CPU based approach, but ultimately I decided to keep it around. In essence, this project serves as a demonstration of the capabilities of the modern graphics card, and how some tasks are best offloaded to the GPU to leverage its fast parallel processing power. While collision were not implemented due to the player controller being a freestyle camera, CPU readback is possible and collisions are given to each mesh chunk, it'd just need to be set up with Unity's layer system.
 
 Near the end of this project, I gave the CPU based approach some more Quality of Life features, such as automatically determining the voxel size to make adjusting the parameters more intuitive (adjust 2 parameters instead of 3). Admittedly, there are some quirks with the CPU based approach that were left unfixed, such as the Planet radius being somewhat limited to 3x the Grid Size, otherwise parts of the mesh get cut off. I believe this is an error that results the planet not being positioned and scaled with world units. This error was fixed in the compute shader version, the mesh will never cut off at any point due to proper positioning + scaling, and the implementation of a buffer of 1 voxel around the edge of the planet. Additionally, being able to blur the Density Texture with a blur compute shader helps round out some of the harsh edges that would otherwise get generated. Another strength that the compute shader approach has is the ability to weld vertices together which in turn results in smooth shading. I left a toggle to re-enable flat shading if the user prefers it.
-
 I consider the compute shader approach to be more polished, the cpu based approach was more or less left in as an archive and proof of experimentation.
+
+My original goals for this project was to have procedural terrain that was fast to generate and had a lot of parameters, with the intent of being able to change these in real-time (whether through sliders in the inspection window, or through an in-game tool like terraforming). This would make the project more akin to what I had envisioned in the Case study in Task 1. While I tried to keep terraforming or real-time terrain manipulation out of the scope for this project, knowing how difficult it would be to implement, I'd still consider it one of the biggest features that had to ultimately be reconsidered/cut from the current iteration of the project.
+
+The primary cause for change was due to time constraints, technical difficulties and lack of knowledge in the area of compute shaders. Many days were spent trying to unravel the mystery of Unreal Engine and compute shaders, in the end I decided to start over from scratch in Unity.More time was spent porting the code from C++ to C#, and trying to learn how to port the code from C# to HLSL. I, in particular really struggle to balance employment and study, so this also contributed to some of the difficulty I faced working on this project.
+
+I would mitigate these issues in the future by doing thorough research prior to just assembling things in an engine without knowing its strengths and limitations. I learned this the hard way, and this is exactly why spec doc's are crucial in the process of game development. I would use this newfound knowledge if I were in a 3rd year project, there isn't time to be spent in meaningless trial and error if proper research was conducted prior to commencing development.
+
+Had I been given more time, one feature I would have loved to implement would have to be terraforming, I think it's a great way to showcase the power of render textures and compute shaders, the ability to terraform procedurally generated terrain just isn't feasible on the CPU. I was able to succesfully implement a chunk system, which is crucial for performance. if I were collaborating on a system like this, I think it'd be important to ensure modularity for ease of integration.
 
 # Engine of Choice:
 Unity 2022.3.45f1
